@@ -1,0 +1,10 @@
+/res/*
+!/res/*.xml-sample
+!/res/.keep-me
+/testc/testc
+*\~
+*.swp
+*.log
+u2byckdump
+*.sh
+
