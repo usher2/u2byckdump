@@ -23,13 +23,13 @@ func NormalizeDomain(domain string) string {
 	return domain
 }
 
-func NormalizeUrl(u string) string {
+func NormalizeUrl(u string) (nurl, host string) {
 	u = strings.Replace(u, "\\", "/", -1)
 	_url, err := url.Parse(u)
 	if err != nil {
 		Error.Printf("URL parse error: %s\n", err.Error())
 		// add as is
-		return u
+		return u, ""
 	} else {
 		port := ""
 		domain := _url.Hostname()
@@ -43,6 +43,6 @@ func NormalizeUrl(u string) string {
 			_url.Host = _url.Host + ":" + port
 		}
 		_url.Fragment = ""
-		return _url.String()
+		return _url.String(), domain
 	}
 }

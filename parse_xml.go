@@ -182,7 +182,11 @@ func Parse(dumpFile io.Reader) error {
 				DumpSnap.DeleteIp(v.Ip4, o2.Id)
 			}
 			for _, v := range o2.Url {
-				DumpSnap.DeleteUrl(NormalizeUrl(v.Url), o2.Id)
+				url, domain := NormalizeUrl(v.Url)
+				DumpSnap.DeleteUrl(url, o2.Id)
+				if len(o2.Domain) == 0 {
+					DumpSnap.DeleteDomain(domain, o2.Id)
+				}
 			}
 			for _, v := range o2.Domain {
 				DumpSnap.DeleteDomain(NormalizeDomain(v.Domain), o2.Id)
@@ -319,32 +323,44 @@ func (v *TMinContent) handleAddUrl(v0 *TContent) {
 	if len(v0.Url) > 0 {
 		v.Url = v0.Url
 		for _, value := range v.Url {
-			url := NormalizeUrl(value.Url)
+			url, domain := NormalizeUrl(value.Url)
 			DumpSnap.AddUrl(url, v.Id)
 			if url[:8] == "https://" {
 				v0.HttpsBlock += 1
+			}
+			if len(v0.Domain) == 0 {
+				DumpSnap.AddDomain(domain, v.Id)
 			}
 		}
 	}
 }
 
 func (v *TMinContent) handleUpdateUrl(v0 *TContent, o *TMinContent) {
-	urlSet := NewStringSet(len(v.Url))
+	urlSet := NewStringSet(len(v0.Url))
+	domainSet := NewStringSet(len(v0.Url))
 	if len(v0.Url) > 0 {
 		v.Url = v0.Url
 		for _, value := range v.Url {
-			url := NormalizeUrl(value.Url)
+			url, domain := NormalizeUrl(value.Url)
 			DumpSnap.AddUrl(url, v.Id)
 			if url[:8] == "https://" {
 				v0.HttpsBlock += 1
 			}
 			urlSet[url] = NothingV
+			if len(v0.Domain) == 0 {
+				DumpSnap.AddDomain(domain, v.Id)
+			}
 		}
 	}
 	for _, value := range o.Url {
-		url := NormalizeUrl(value.Url)
+		url, domain := NormalizeUrl(value.Url)
 		if _, ok := urlSet[url]; !ok {
 			DumpSnap.DeleteUrl(url, o.Id)
+		}
+		if len(v0.Domain) == 0 {
+			if _, ok := domainSet[url]; !ok {
+				DumpSnap.DeleteDomain(domain, o.Id)
+			}
 		}
 	}
 }
