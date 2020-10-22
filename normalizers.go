@@ -26,6 +26,9 @@ func NormalizeDomain(domain string) string {
 func NormalizeUrl(u string) (nurl, host string) {
 	u = strings.Replace(u, "\\", "/", -1)
 	_url, err := url.Parse(u)
+	if err == nil && _url.Scheme == "" {
+		_url, err = url.Parse("https://" + u) // shit for resolve bogus URL problem
+	}
 	if err != nil {
 		Error.Printf("URL parse error: %s\n", err.Error())
 		// add as is
