@@ -4,8 +4,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	pb "github.com/usher2/u2byckdump/msg"
 )
@@ -20,8 +18,9 @@ func (s *server) SearchID(ctx context.Context, in *pb.IDRequest) (*pb.SearchResp
 	if DumpSnap != nil && DumpSnap.utime > 0 {
 		DumpSnap.RLock()
 		r := &pb.SearchResponse{RegistryUpdateTime: DumpSnap.utime}
+		Debug.Printf("ut: %d", DumpSnap.utime)
 		if v, ok := DumpSnap.Content[query]; ok {
-			fmt.Fprintf(os.Stderr, "JSON: %s\n", v.Pack)
+			Debug.Printf("SearchID JSON: %s\n", v.Pack)
 			r.Results = make([]*pb.Content, 1)
 			r.Results[0] = v.newPbContent(0, nil, "", "", "")
 		}
@@ -40,6 +39,7 @@ func (s *server) SearchIP4(c context.Context, in *pb.IP4Request) (*pb.SearchResp
 	if DumpSnap != nil && DumpSnap.utime > 0 {
 		DumpSnap.RLock()
 		r := &pb.SearchResponse{RegistryUpdateTime: DumpSnap.utime}
+		Debug.Printf("ut: %d", DumpSnap.utime)
 		if a, ok := DumpSnap.ip[query]; ok {
 			for _, id := range a {
 				v1 = append(v1, id)
@@ -49,7 +49,7 @@ func (s *server) SearchIP4(c context.Context, in *pb.IP4Request) (*pb.SearchResp
 		j := 0
 		for _, id := range v1 {
 			if v, ok := DumpSnap.Content[id]; ok {
-				fmt.Fprintf(os.Stderr, "JSON: %s\n", v.Pack)
+				Debug.Printf("SearchIP4 JSON: %s\n", v.Pack)
 				r.Results[j] = v.newPbContent(query, nil, "", "", "")
 				j++
 			}
@@ -67,12 +67,13 @@ func (s *server) SearchURL(ctx context.Context, in *pb.URLRequest) (*pb.SearchRe
 	if DumpSnap != nil && DumpSnap.utime > 0 {
 		DumpSnap.RLock()
 		r := &pb.SearchResponse{RegistryUpdateTime: DumpSnap.utime}
+		Debug.Printf("ut: %d", DumpSnap.utime)
 		a := DumpSnap.url[query]
 		r.Results = make([]*pb.Content, len(a))
 		i := 0
 		for _, id := range a {
 			if v, ok := DumpSnap.Content[id]; ok {
-				fmt.Fprintf(os.Stderr, "JSON: %s\n", v.Pack)
+				Debug.Printf("SearchURL JSON: %s\n", v.Pack)
 				r.Results[i] = v.newPbContent(0, nil, "", query, "")
 				i++
 			}
@@ -90,12 +91,13 @@ func (s *server) SearchDomain(ctx context.Context, in *pb.DomainRequest) (*pb.Se
 	if DumpSnap != nil && DumpSnap.utime > 0 {
 		DumpSnap.RLock()
 		r := &pb.SearchResponse{RegistryUpdateTime: DumpSnap.utime}
+		Debug.Printf("ut: %d", DumpSnap.utime)
 		a := DumpSnap.domain[query]
 		r.Results = make([]*pb.Content, len(a))
 		i := 0
 		for _, id := range a {
 			if v, ok := DumpSnap.Content[id]; ok {
-				fmt.Fprintf(os.Stderr, "JSON: %s\n", v.Pack)
+				Debug.Printf("SearchDomain JSON: %s\n", v.Pack)
 				r.Results[i] = v.newPbContent(0, nil, query, "", "")
 				i++
 			}
