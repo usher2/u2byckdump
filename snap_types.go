@@ -28,7 +28,7 @@ type TContent struct {
 	Ip4          []TIp4    `json:"ip4,omitempty"`
 	Domain       []TDomain `json:"dm,omitempty"`
 	HttpsBlock   int       `json:"hb"`
-	U2Hash       uint64    `json:"u2h"`
+	//U2Hash       uint64    `json:"u2h"`
 }
 
 type TDomain struct {

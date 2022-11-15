@@ -156,7 +156,7 @@ func Parse(dumpFile io.Reader) error {
 						v.Add(u2Hash, r.UpdateTime)
 						Stats.CntAdd++
 					}
-					SPass[v.U2Hash] = NothingV
+					SPass[u2Hash] = NothingV
 				} else if v0.U2Hash != u2Hash {
 					err := UnmarshalContent(tempBuf, &v)
 					if err != nil {
@@ -165,7 +165,7 @@ func Parse(dumpFile io.Reader) error {
 						v.Update(u2Hash, v0, r.UpdateTime)
 						Stats.CntUpdate++
 					}
-					SPass[v.U2Hash] = NothingV
+					SPass[u2Hash] = NothingV
 				} else {
 					DumpSnap.Content[u2Hash].RegistryUpdateTime = r.UpdateTime
 					SPass[v0.U2Hash] = NothingV
@@ -255,7 +255,7 @@ func (v *TContent) constructBlockType() int32 {
 func (v *TContent) Update(u2Hash uint64, o *TMinContent, updateTime int64) {
 	pack := v.Marshal()
 	v1 := newMinContent(v.Id, u2Hash, updateTime, pack)
-	DumpSnap.Content[v.U2Hash] = v1
+	DumpSnap.Content[u2Hash] = v1
 	v1.handleUpdateIp(v, o)
 	v1.handleUpdateUrl(v, o)
 	v1.handleUpdateDomain(v, o)
@@ -265,7 +265,7 @@ func (v *TContent) Update(u2Hash uint64, o *TMinContent, updateTime int64) {
 func (v *TContent) Add(u2Hash uint64, updateTime int64) {
 	pack := v.Marshal()
 	v1 := newMinContent(v.Id, u2Hash, updateTime, pack)
-	DumpSnap.Content[v.U2Hash] = v1
+	DumpSnap.Content[u2Hash] = v1
 	v1.handleAddIp(v)
 	v1.handleAddUrl(v)
 	v1.handleAddDomain(v)
