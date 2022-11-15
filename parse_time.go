@@ -3,7 +3,7 @@ package main
 import "time"
 
 const cParseResourcesDate = "2006-01-02 15:04:05"
-const cParseDateOff = "2006-01-02"
+const cParseDateOff = "2006-01-02 15:04:05"
 
 func parseTimeMSK(tpl string, s string) int64 {
 	if s == "" {
