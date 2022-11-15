@@ -268,7 +268,7 @@ func (v *TContent) Add(u2Hash uint64, updateTime int64) {
 func (v *TMinContent) handleAddIp(v0 *TContent) {
 	if len(v0.Ip4) > 0 {
 		v.Ip4 = v0.Ip4
-		for i, _ := range v.Ip4 {
+		for i := range v.Ip4 {
 			DumpSnap.AddIp(v.Ip4[i].Ip4, v.Id)
 		}
 	}
@@ -278,12 +278,12 @@ func (v *TMinContent) handleUpdateIp(v0 *TContent, o *TMinContent) {
 	ipSet := make(map[uint32]Nothing, len(v.Ip4))
 	if len(v0.Ip4) > 0 {
 		v.Ip4 = v0.Ip4
-		for i, _ := range v.Ip4 {
+		for i := range v.Ip4 {
 			DumpSnap.AddIp(v.Ip4[i].Ip4, v.Id)
 			ipSet[v.Ip4[i].Ip4] = NothingV
 		}
 	}
-	for i, _ := range o.Ip4 {
+	for i := range o.Ip4 {
 		ip := o.Ip4[i].Ip4
 		if _, ok := ipSet[ip]; !ok {
 			DumpSnap.DeleteIp(ip, o.Id)
