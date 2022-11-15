@@ -1,10 +1,10 @@
 package main
 
-type ArrayIntSet []int32
+type ArrayIntSet []uint64
 
 func (a ArrayIntSet) Blank() bool { return len(a) == 0 }
 
-func (a ArrayIntSet) Add(v int32) ArrayIntSet {
+func (a ArrayIntSet) Add(v uint64) ArrayIntSet {
 	for i := range a {
 		if a[i] == v {
 			return a
@@ -13,7 +13,7 @@ func (a ArrayIntSet) Add(v int32) ArrayIntSet {
 	return append(a, v)
 }
 
-func (a ArrayIntSet) Del(v int32) ArrayIntSet {
+func (a ArrayIntSet) Del(v uint64) ArrayIntSet {
 	idx := -1
 	for i := range a {
 		if a[i] == v {

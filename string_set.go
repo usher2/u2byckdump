@@ -8,7 +8,7 @@ func NewStringSet(size int) StringSet {
 
 type StringIntSet map[string]ArrayIntSet
 
-func (a *StringIntSet) Delete(i string, id int32) (last bool) {
+func (a *StringIntSet) Delete(i string, id uint64) (last bool) {
 	last = false
 	if v, ok := (*a)[i]; ok {
 		v = v.Del(id)
@@ -22,7 +22,7 @@ func (a *StringIntSet) Delete(i string, id int32) (last bool) {
 	return
 }
 
-func (a *StringIntSet) Add(i string, id int32) (first bool) {
+func (a *StringIntSet) Add(i string, id uint64) (first bool) {
 	first = false
 	if v, ok := (*a)[i]; !ok {
 		v = make(ArrayIntSet, 0, 1)

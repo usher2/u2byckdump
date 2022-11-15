@@ -6,8 +6,8 @@ import (
 
 type (
 	Nothing        struct{}
-	IntSet         map[int32]Nothing
-	TMinContentMap map[int32]*TMinContent
+	IntSet         map[uint64]Nothing
+	TMinContentMap map[uint64]*TMinContent
 )
 
 var NothingV = Nothing{}
@@ -42,25 +42,25 @@ func NewTDump() *TDump {
 	}
 }
 
-func (t *TDump) AddIp(ip uint32, id int32) {
+func (t *TDump) AddIp(ip uint32, id uint64) {
 	t.ip.Add(ip, id)
 }
 
-func (t *TDump) DeleteIp(ip uint32, id int32) {
+func (t *TDump) DeleteIp(ip uint32, id uint64) {
 	t.ip.Delete(ip, id)
 }
 
-func (t *TDump) AddUrl(i string, id int32) {
+func (t *TDump) AddUrl(i string, id uint64) {
 	t.url.Add(i, id)
 }
-func (t *TDump) DeleteUrl(i string, id int32) {
+func (t *TDump) DeleteUrl(i string, id uint64) {
 	t.url.Delete(i, id)
 }
 
-func (t *TDump) AddDomain(i string, id int32) {
+func (t *TDump) AddDomain(i string, id uint64) {
 	t.domain.Add(i, id)
 }
-func (t *TDump) DeleteDomain(i string, id int32) {
+func (t *TDump) DeleteDomain(i string, id uint64) {
 	t.domain.Delete(i, id)
 }
 

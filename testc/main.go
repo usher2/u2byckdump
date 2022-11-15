@@ -136,7 +136,8 @@ func printContent(packet *pb.Content) {
 	content := TContent{}
 	err := json.Unmarshal(packet.Pack, &content)
 	if err != nil {
-		fmt.Printf("Oooops!!! %s\n", err.Error)
+		fmt.Printf("Oooops!!! %s\n", err)
+
 		return
 	}
 	switch packet.BlockType {
@@ -163,7 +164,7 @@ func searchID(c pb.CheckClient) {
 		fmt.Printf("Looking for content: %d\n", id)
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
-		r, err := c.SearchID(ctx, &pb.IDRequest{Query: id})
+		r, err := c.SearchID(ctx, &pb.IDRequest{Query: uint64(id)})
 		if err != nil {
 			fmt.Printf("%v.SearchID(_) = _, %v\n", c, err)
 			return

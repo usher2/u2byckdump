@@ -121,7 +121,7 @@ func Parse(dumpFile io.Reader) error {
 			case elementRegister:
 				handleRegister(_e, &r)
 			case elementContent:
-				id := getContentId(_e)
+				// id := getContentId(_e)
 				// parse <resource>...</resource> only if need
 				decoder.Skip()
 				dif := tokenStartOffset - bufferOffset
@@ -140,7 +140,7 @@ func Parse(dumpFile io.Reader) error {
 				v := TContent{}
 				// create or update
 				DumpSnap.Lock()
-				v0, exists := DumpSnap.Content[id]
+				v0, exists := DumpSnap.Content[u2Hash]
 				if !exists {
 					err := UnmarshalContent(tempBuf, &v)
 					if err != nil {
@@ -149,7 +149,7 @@ func Parse(dumpFile io.Reader) error {
 						v.Add(u2Hash, r.UpdateTime)
 						Stats.CntAdd++
 					}
-					SPass[v.Id] = NothingV
+					SPass[v.U2Hash] = NothingV
 				} else if v0.U2Hash != u2Hash {
 					err := UnmarshalContent(tempBuf, &v)
 					if err != nil {
@@ -158,10 +158,10 @@ func Parse(dumpFile io.Reader) error {
 						v.Update(u2Hash, v0, r.UpdateTime)
 						Stats.CntUpdate++
 					}
-					SPass[v.Id] = NothingV
+					SPass[v.U2Hash] = NothingV
 				} else {
-					DumpSnap.Content[id].RegistryUpdateTime = r.UpdateTime
-					SPass[v0.Id] = NothingV
+					DumpSnap.Content[u2Hash].RegistryUpdateTime = r.UpdateTime
+					SPass[v0.U2Hash] = NothingV
 					//v = nil
 				}
 				DumpSnap.Unlock()
@@ -179,17 +179,17 @@ func Parse(dumpFile io.Reader) error {
 	for id, o2 := range DumpSnap.Content {
 		if _, ok := SPass[id]; !ok {
 			for _, v := range o2.Ip4 {
-				DumpSnap.DeleteIp(v.Ip4, o2.Id)
+				DumpSnap.DeleteIp(v.Ip4, o2.U2Hash)
 			}
 			for _, v := range o2.Url {
 				url, domain := NormalizeUrl(v.Url)
-				DumpSnap.DeleteUrl(url, o2.Id)
+				DumpSnap.DeleteUrl(url, o2.U2Hash)
 				if len(o2.Domain) == 0 {
-					DumpSnap.DeleteDomain(domain, o2.Id)
+					DumpSnap.DeleteDomain(domain, o2.U2Hash)
 				}
 			}
 			for _, v := range o2.Domain {
-				DumpSnap.DeleteDomain(NormalizeDomain(v.Domain), o2.Id)
+				DumpSnap.DeleteDomain(NormalizeDomain(v.Domain), o2.U2Hash)
 			}
 			delete(DumpSnap.Content, id)
 			Stats.CntRemove++
@@ -248,7 +248,7 @@ func (v *TContent) constructBlockType() int32 {
 func (v *TContent) Update(u2Hash uint64, o *TMinContent, updateTime int64) {
 	pack := v.Marshal()
 	v1 := newMinContent(v.Id, u2Hash, updateTime, pack)
-	DumpSnap.Content[v.Id] = v1
+	DumpSnap.Content[v.U2Hash] = v1
 	v1.handleUpdateIp(v, o)
 	v1.handleUpdateUrl(v, o)
 	v1.handleUpdateDomain(v, o)
@@ -258,7 +258,7 @@ func (v *TContent) Update(u2Hash uint64, o *TMinContent, updateTime int64) {
 func (v *TContent) Add(u2Hash uint64, updateTime int64) {
 	pack := v.Marshal()
 	v1 := newMinContent(v.Id, u2Hash, updateTime, pack)
-	DumpSnap.Content[v.Id] = v1
+	DumpSnap.Content[v.U2Hash] = v1
 	v1.handleAddIp(v)
 	v1.handleAddUrl(v)
 	v1.handleAddDomain(v)
@@ -269,7 +269,7 @@ func (v *TMinContent) handleAddIp(v0 *TContent) {
 	if len(v0.Ip4) > 0 {
 		v.Ip4 = v0.Ip4
 		for i := range v.Ip4 {
-			DumpSnap.AddIp(v.Ip4[i].Ip4, v.Id)
+			DumpSnap.AddIp(v.Ip4[i].Ip4, v.U2Hash)
 		}
 	}
 }
@@ -279,14 +279,14 @@ func (v *TMinContent) handleUpdateIp(v0 *TContent, o *TMinContent) {
 	if len(v0.Ip4) > 0 {
 		v.Ip4 = v0.Ip4
 		for i := range v.Ip4 {
-			DumpSnap.AddIp(v.Ip4[i].Ip4, v.Id)
+			DumpSnap.AddIp(v.Ip4[i].Ip4, v.U2Hash)
 			ipSet[v.Ip4[i].Ip4] = NothingV
 		}
 	}
 	for i := range o.Ip4 {
 		ip := o.Ip4[i].Ip4
 		if _, ok := ipSet[ip]; !ok {
-			DumpSnap.DeleteIp(ip, o.Id)
+			DumpSnap.DeleteIp(ip, o.U2Hash)
 		}
 	}
 }
@@ -296,7 +296,7 @@ func (v *TMinContent) handleAddDomain(v0 *TContent) {
 		v.Domain = v0.Domain
 		for _, value := range v.Domain {
 			domain := NormalizeDomain(value.Domain)
-			DumpSnap.AddDomain(domain, v.Id)
+			DumpSnap.AddDomain(domain, v.U2Hash)
 		}
 	}
 }
@@ -307,14 +307,14 @@ func (v *TMinContent) handleUpdateDomain(v0 *TContent, o *TMinContent) {
 		v.Domain = v0.Domain
 		for _, value := range v.Domain {
 			domain := NormalizeDomain(value.Domain)
-			DumpSnap.AddDomain(domain, v.Id)
+			DumpSnap.AddDomain(domain, v.U2Hash)
 			domainSet[domain] = NothingV
 		}
 	}
 	for _, value := range o.Domain {
 		domain := NormalizeDomain(value.Domain)
 		if _, ok := domainSet[domain]; !ok {
-			DumpSnap.DeleteDomain(domain, o.Id)
+			DumpSnap.DeleteDomain(domain, o.U2Hash)
 		}
 	}
 }
@@ -324,12 +324,12 @@ func (v *TMinContent) handleAddUrl(v0 *TContent) {
 		v.Url = v0.Url
 		for _, value := range v.Url {
 			url, domain := NormalizeUrl(value.Url)
-			DumpSnap.AddUrl(url, v.Id)
+			DumpSnap.AddUrl(url, v.U2Hash)
 			if url[:8] == "https://" {
 				v0.HttpsBlock += 1
 			}
 			if len(v0.Domain) == 0 {
-				DumpSnap.AddDomain(domain, v.Id)
+				DumpSnap.AddDomain(domain, v.U2Hash)
 			}
 		}
 	}
@@ -342,24 +342,24 @@ func (v *TMinContent) handleUpdateUrl(v0 *TContent, o *TMinContent) {
 		v.Url = v0.Url
 		for _, value := range v.Url {
 			url, domain := NormalizeUrl(value.Url)
-			DumpSnap.AddUrl(url, v.Id)
+			DumpSnap.AddUrl(url, v.U2Hash)
 			if url[:8] == "https://" {
 				v0.HttpsBlock += 1
 			}
 			urlSet[url] = NothingV
 			if len(v0.Domain) == 0 {
-				DumpSnap.AddDomain(domain, v.Id)
+				DumpSnap.AddDomain(domain, v.U2Hash)
 			}
 		}
 	}
 	for _, value := range o.Url {
 		url, domain := NormalizeUrl(value.Url)
 		if _, ok := urlSet[url]; !ok {
-			DumpSnap.DeleteUrl(url, o.Id)
+			DumpSnap.DeleteUrl(url, o.U2Hash)
 		}
 		if len(v0.Domain) == 0 {
 			if _, ok := domainSet[url]; !ok {
-				DumpSnap.DeleteDomain(domain, o.Id)
+				DumpSnap.DeleteDomain(domain, o.U2Hash)
 			}
 		}
 	}
