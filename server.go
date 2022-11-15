@@ -93,6 +93,7 @@ func (s *server) SearchDomain(ctx context.Context, in *pb.DomainRequest) (*pb.Se
 		r := &pb.SearchResponse{RegistryUpdateTime: DumpSnap.utime}
 		Debug.Printf("ut: %d", DumpSnap.utime)
 		a := DumpSnap.domain[query]
+		Debug.Printf("SearchDomain (%d) %v\n", len(a), a)
 		r.Results = make([]*pb.Content, len(a))
 		i := 0
 		for _, id := range a {
