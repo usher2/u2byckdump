@@ -4,6 +4,8 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"os"
 
 	pb "github.com/usher2/u2byckdump/msg"
 )
@@ -90,6 +92,7 @@ func (s *server) SearchDomain(ctx context.Context, in *pb.DomainRequest) (*pb.Se
 		i := 0
 		for _, id := range a {
 			if v, ok := DumpSnap.Content[id]; ok {
+				fmt.Fprintf(os.Stderr, "JSON: %s\n", v.Pack)
 				r.Results[i] = v.newPbContent(0, nil, query, "", "")
 				i++
 			}
