@@ -13,13 +13,16 @@ import (
 )
 
 const (
-	elementRegister    = "resources"
-	elementContent     = "resource"
-	elementIncludeTime = "dateoff"
-	elementDescription = "info"
-	elementUrl         = "url"
-	elementDomain      = "dns"
-	elementIp          = "ip"
+	elementRegister          = "resources"
+	elementContent           = "resource"
+	elementIncludeTimeLegacy = "dateoff"
+	elementIncludeTime       = "date_off"
+	elementDecisionLegacy    = "info"
+	elementDecision          = "decision"
+	elementDecisionInfo      = "decision_info"
+	elementUrl               = "url"
+	elementDomain            = "dns"
+	elementIp                = "ip"
 )
 
 var __h64 hash.Hash64
@@ -42,14 +45,18 @@ func UnmarshalContent(b []byte, v *TContent) error {
 				if err := parseContentElement(element, v); err != nil {
 					return err
 				}
-			case elementIncludeTime:
+			case elementIncludeTime, elementIncludeTimeLegacy:
 				var t string
 				if err := decoder.DecodeElement(&t, &element); err != nil {
 					return err
 				}
 				v.IncludeTime = parseTimeMSK(cParseDateOff, t) + 3600*12 // dirty hack for noon
-			case elementDescription:
-				if err := decoder.DecodeElement(&v.Description, &element); err != nil {
+			case elementDecision, elementDecisionLegacy:
+				if err := decoder.DecodeElement(&v.Decision, &element); err != nil {
+					return err
+				}
+			case elementDecisionInfo:
+				if err := decoder.DecodeElement(&v.DecisionInfo, &element); err != nil {
 					return err
 				}
 			case elementUrl:
