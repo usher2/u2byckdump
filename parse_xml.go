@@ -144,7 +144,7 @@ func Parse(dumpFile io.Reader) error {
 				__h64.Write(tempBuf)
 				u2Hash := __h64.Sum64()
 				bufferOffset = tokenStartOffset
-				v := TContent{}
+				v := TContent{U2Hash: u2Hash}
 				// create or update
 				DumpSnap.Lock()
 				v0, exists := DumpSnap.Content[u2Hash]
@@ -168,7 +168,7 @@ func Parse(dumpFile io.Reader) error {
 					SPass[u2Hash] = NothingV
 				} else {
 					DumpSnap.Content[u2Hash].RegistryUpdateTime = r.UpdateTime
-					SPass[v0.U2Hash] = NothingV
+					SPass[u2Hash] = NothingV
 					//v = nil
 				}
 				DumpSnap.Unlock()
