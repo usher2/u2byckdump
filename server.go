@@ -21,6 +21,7 @@ func (s *server) SearchID(ctx context.Context, in *pb.IDRequest) (*pb.SearchResp
 		DumpSnap.RLock()
 		r := &pb.SearchResponse{RegistryUpdateTime: DumpSnap.utime}
 		if v, ok := DumpSnap.Content[query]; ok {
+			fmt.Fprintf(os.Stderr, "JSON: %s\n", v.Pack)
 			r.Results = make([]*pb.Content, 1)
 			r.Results[0] = v.newPbContent(0, nil, "", "", "")
 		}
@@ -48,6 +49,7 @@ func (s *server) SearchIP4(c context.Context, in *pb.IP4Request) (*pb.SearchResp
 		j := 0
 		for _, id := range v1 {
 			if v, ok := DumpSnap.Content[id]; ok {
+				fmt.Fprintf(os.Stderr, "JSON: %s\n", v.Pack)
 				r.Results[j] = v.newPbContent(query, nil, "", "", "")
 				j++
 			}
@@ -70,6 +72,7 @@ func (s *server) SearchURL(ctx context.Context, in *pb.URLRequest) (*pb.SearchRe
 		i := 0
 		for _, id := range a {
 			if v, ok := DumpSnap.Content[id]; ok {
+				fmt.Fprintf(os.Stderr, "JSON: %s\n", v.Pack)
 				r.Results[i] = v.newPbContent(0, nil, "", query, "")
 				i++
 			}
